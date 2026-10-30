@@ -4,23 +4,28 @@ export default app;
 
 import morgan from "morgan";
 
-app.use(express.json());
+import tracksRouter from "#api/tracks";
+import playlistsRouter from "#api/playlists";
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-app.use("/playlistsTracks", playlistsTracksRouter);
-app.use("/tracks", trakcsRouter);
+app.use("/tracks", tracksRouter);
 app.use("/playlists", playlistsRouter);
 
 app.use((err, req, res, next) => {
+  // A switch statement can be used instead of if statements
+  // when multiple cases are handled the same way.
   switch (err.code) {
-    case "22P02": // invalid input syntax
+    // Invalid type
+    case "22P02":
       return res.status(400).send(err.message);
-
-    case "23505": // unique constraint
-    case "23503": // foreign key violation
+    // Unique constraint violation
+    case "23505":
+    // Foreign key violation
+    case "23503":
       return res.status(400).send(err.detail);
-
     default:
       next(err);
   }
